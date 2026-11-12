@@ -8,9 +8,11 @@ import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import HowItWorks, { UniqueFeatures, TrustRow } from "@/components/home/HowItWorks";
 import { PopularTemplates, PopularCategories, SocialFormats } from "@/components/home/Sections";
+import { TrendingMarquee } from "@/components/home/TrendingMarquee";
 import FAQ from "@/components/home/FAQ";
 import MemeEditor from "@/components/editor/MemeEditor";
 import TemplateLibrary from "@/components/templates/TemplateLibrary";
+import TrendingMemes from "@/components/trending/TrendingMemes";
 import BatchCreator from "@/components/batch/BatchCreator";
 import LandingPage from "@/components/landing/LandingPage";
 import GuideView from "@/components/landing/GuideView";
@@ -37,7 +39,7 @@ export default function Home() {
       const raw = window.location.hash.replace(/^#/, "");
       if (!raw) return;
       const [viewPart, ...rest] = raw.split("/");
-      const validViews = ["home", "editor", "templates", "batch", "guides", "guide", "landing", "about", "privacy"];
+      const validViews = ["home", "editor", "templates", "trending", "batch", "guides", "guide", "landing", "about", "privacy"];
       if (validViews.includes(viewPart)) {
         const params: Record<string, string> = {};
         for (const part of rest) {
@@ -61,6 +63,7 @@ export default function Home() {
         {view === "home" && (
           <>
             <Hero />
+            <TrendingMarquee />
             <TrustRow />
             <HowItWorks />
             <PopularTemplates />
@@ -78,6 +81,7 @@ export default function Home() {
         {view === "templates" && (
           <TemplateLibrary initialCategory={viewParams.category} />
         )}
+        {view === "trending" && <TrendingMemes />}
         {view === "batch" && <BatchCreator />}
         {view === "landing" && <LandingPage slug={viewParams.page || ""} />}
         {view === "guides" && <GuideView />}

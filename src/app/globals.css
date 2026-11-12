@@ -151,3 +151,33 @@
 
 /* Smooth font rendering for canvas-heavy UI */
 canvas { -webkit-font-smoothing: antialiased; }
+
+/* Marquee animation for trending memes */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-scroll {
+  width: max-content;
+  will-change: transform;
+}
+.marquee-scroll:hover {
+  animation-play-state: paused;
+}
+
+/* Subtle entrance animation utility */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.4s ease-out both; }
+
+/* Gradient text shimmer */
+@keyframes gradient-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.gradient-shimmer {
+  background-size: 200% auto;
+  animation: gradient-shimmer 4s ease-in-out infinite;
+}

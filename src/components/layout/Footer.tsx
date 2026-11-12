@@ -4,6 +4,7 @@ import { useMemeStore } from "@/lib/store";
 import { Hammer, Github, Twitter, Heart } from "lucide-react";
 
 const LINKS: { label: string; view: any; params?: Record<string, string> }[] = [
+  { label: "🔥 Trending Memes", view: "trending" },
   { label: "Meme Generator", view: "landing", params: { page: "meme-generator" } },
   { label: "Meme Maker", view: "landing", params: { page: "meme-maker" } },
   { label: "Multi-Panel Meme Maker", view: "landing", params: { page: "multi-panel-meme-maker" } },

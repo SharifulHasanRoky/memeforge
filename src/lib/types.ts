@@ -95,12 +95,32 @@ export type EditorView =
   | "home"
   | "editor"
   | "templates"
+  | "trending"
   | "batch"
   | "guides"
   | "guide"
   | "landing"
   | "about"
   | "privacy";
+
+export interface TrendingMeme {
+  id: string;
+  title: string;
+  imageUrl: string;
+  width?: number;
+  height?: number;
+  source: "imgflip" | "web";
+  captions?: number;
+  boxCount?: number;
+  url?: string;
+}
+
+export interface TrendingData {
+  memes: TrendingMeme[];
+  trending: string[];
+  generatedAt: string;
+  sources: { imgflip: number; web: number };
+}
 
 export type CaptionTone =
   | "funny"

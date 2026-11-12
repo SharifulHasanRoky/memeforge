@@ -156,6 +156,9 @@ interface MemeState {
   restoreSession: () => boolean;
   clearSession: () => void;
 
+  // Load a trending viral meme as the editor base (fetches the image, scales canvas, adds as image layer)
+  loadTrendingMeme: (meme: { imageUrl: string; title: string; width?: number; height?: number }) => Promise<void>;
+
   // Helpers
   getSelectedLayer: () => Layer | null;
 }
@@ -445,6 +448,84 @@ export const useMemeStore = create<MemeState>((set, get) => ({
   clearSession: () => {
     if (typeof window === "undefined") return;
     localStorage.removeItem("memeforge:session");
+  },
+
+  loadTrendingMeme: async (meme) => {
+    // Fetch the image as a data URL so we don't run into CORS issues during canvas export.
+    try {
+      const res = await fetch(meme.imageUrl, { mode: "cors" });
+      const blob = await res.blob();
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result as string);
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+      });
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const i = new Image();
+        i.crossOrigin = "anonymous";
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = dataUrl;
+      });
+      // Reset the canvas to the meme's natural aspect ratio (cap to 1500 max for performance)
+      const maxDim = 1500;
+      const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      get().pushHistory();
+      set({
+        canvasWidth: w,
+        canvasHeight: h,
+        background: { type: "color", color: "#ffffff", gradientFrom: "#6d28d9", gradientTo: "#db2777", gradientAngle: 135 },
+        layers: [],
+        selectedLayerId: null,
+        platformFormat: "custom",
+      });
+      // Add the image as a full-cover image layer
+      get().addImageLayer(dataUrl, img.naturalWidth, img.naturalHeight);
+      // Add a default top text placeholder layer for easy editing
+      get().addTextLayer({
+        text: "TOP TEXT",
+        y: Math.round(h * 0.04),
+        height: Math.round(h * 0.15),
+        fontSize: Math.round(h * 0.09),
+        outlineWidth: Math.max(3, Math.round(h * 0.006)),
+      });
+      get().addTextLayer({
+        text: "BOTTOM TEXT",
+        y: Math.round(h * 0.81),
+        height: Math.round(h * 0.15),
+        fontSize: Math.round(h * 0.09),
+        outlineWidth: Math.max(3, Math.round(h * 0.006)),
+      });
+    } catch (e) {
+      // Fallback: just set the image URL directly without proxy
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const i = new Image();
+        i.crossOrigin = "anonymous";
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = meme.imageUrl;
+      }).catch(() => null);
+      if (!img) return;
+      const maxDim = 1500;
+      const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      get().pushHistory();
+      set({
+        canvasWidth: w,
+        canvasHeight: h,
+        background: { type: "color", color: "#ffffff", gradientFrom: "#6d28d9", gradientTo: "#db2777", gradientAngle: 135 },
+        layers: [],
+        selectedLayerId: null,
+        platformFormat: "custom",
+      });
+      get().addImageLayer(meme.imageUrl, img.naturalWidth, img.naturalHeight);
+      get().addTextLayer({ text: "TOP TEXT", y: Math.round(h * 0.04), height: Math.round(h * 0.15), fontSize: Math.round(h * 0.09), outlineWidth: Math.max(3, Math.round(h * 0.006)) });
+      get().addTextLayer({ text: "BOTTOM TEXT", y: Math.round(h * 0.81), height: Math.round(h * 0.15), fontSize: Math.round(h * 0.09), outlineWidth: Math.max(3, Math.round(h * 0.006)) });
+    }
   },
 
   getSelectedLayer: () => {

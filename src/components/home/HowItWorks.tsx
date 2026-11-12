@@ -110,8 +110,10 @@ export function TrustRow() {
             { icon: Download, label: "Watermark-free export" },
             { icon: Type, label: "10+ fonts, full styling" },
           ].map((f, i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
-              <f.icon className="w-6 h-6 text-primary" />
+            <div key={i} className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-muted/50 transition">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <f.icon className="w-5 h-5 text-primary" />
+              </div>
               <span className="text-sm text-muted-foreground">{f.label}</span>
             </div>
           ))}
